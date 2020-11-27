@@ -114,6 +114,7 @@ class MultiAdapter:
     #initialize a channel (0 - 3)
     def init_channel(self,width,height,index):
        channel = chr(65+index)
+       print("Initialize channel: " + str(channel))
        self.height = height
        self.width = width
        self.choose_channel(channel)
@@ -131,6 +132,7 @@ class MultiAdapter:
     def preview_channel(self,index):
         factor  = 20
         channel = chr(65+index)
+        print("Preview channel: " + str(channel))
         while True:
             self.select_channel(channel)
             ret, frame = self.camera.read()
