@@ -43,7 +43,7 @@ yRange = np.array([250,840])
 
 pts_focusArea = np.array([[0,yRange[1]],[xRange[0],yRange[0]],[xRange[1],yRange[0]],[470,yRange[1]]])
 
-putt_colors = [(0,0,255),(0,255,0),(255,0,0),(0,255,255),(0,128,255),(255,255,0),(255,0,128),(128,0,255)]
+putt_colors = [(0,0,255),(0,255,0),(255,0,0),(0,255,255),(0,128,255),(255,255,0),(255,0,128),(128,0,255)] #range of colors to choose from for putts
 
 putt_radius_dist_array = [[1,20],[2,15],[3,10]]
 putt_ycoord_dist_array = [[250,280,20],[280,330,15],[330,450,10],[450,600,5],[600,840,3]]
