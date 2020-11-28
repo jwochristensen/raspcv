@@ -10,6 +10,7 @@ import imutils
 import time
 import statistics
 import math
+import AdapterBoard_v03 as AdapterBoard
 
 #https://www.pyimagesearch.com/2018/07/23/simple-object-tracking-with-opencv/
 #https://www.pyimagesearch.com/2015/09/21/opencv-track-object-movement/
@@ -283,13 +284,23 @@ def write_puttlog(frame, puttlog):
 
     return frame
 
+def getCameraVideo():
+    index = 0 #get the first video channel
+    Arducam_adapter_board = AdapterBoard.MultiAdapter()
+    if __name__ == "__main__":
+        Arducam_adapter_board.init_channel(320,240,index) #get the first video channel
+        channel = chr(65+index)
+        Arducam_adapter_board.select_channel(channel)
+
+    return Arducam_adapter_board
 
 #cap = cv2.VideoCapture('200530_Putt2_video.mov')
 
 # if a video path was not supplied, grab the reference
 # to the webcam
 if not args.get("video", False):
-	vs = VideoStream(src=0).start()
+	#vs = VideoStream(src=0).start()
+    vs = getCameraVideo()
 # otherwise, grab a reference to the video file
 else:
 	vs = cv2.VideoCapture(args["video"])

@@ -46,7 +46,7 @@ class MultiAdapter:
         gp.output(11, gpio_sta[1])
         gp.output(12, gpio_sta[2])
         print ('gets here')
-        
+
     def select_channel(self,index):
         channel_info = self.adapter_info.get(index)
         if channel_info == None:
@@ -79,6 +79,8 @@ class MultiAdapter:
         factor  = 20
         black = np.zeros(((self.height+factor)*2, self.width*2, 3), dtype= np.uint8)
         i = 0
+
+        t_end = time.time() + 15 #run process for 15 seconds
         while True:
             self.select_channel(chr(65+i))
             ret, frame = self.camera.read()
@@ -106,7 +108,7 @@ class MultiAdapter:
                 i = 0
             cv.putText(black,'CAM '+index, bottomLeftCornerOfText, font, fontScale,fontColor,lineType)
             cv.imshow("Arducam Multi Camera Demo",black)
-            if cv.waitKey(1) & 0xFF == ord('q'):
+            if (cv.waitKey(1) & 0xFF == ord('q')) | (time.time() >= t_end):
                 del frame
                 self.camera.release()
                 cv.destroyAllWindows()
@@ -140,7 +142,9 @@ class MultiAdapter:
             ret, frame = self.camera.read() #are these needed?
             frame.dtype=np.uint8
 
-            cv.imshow("Arducam Multi Camera Demo",frame)
+            title = "Arducam Multi Camera: Channel " + str(channel)
+
+            cv.imshow(title,frame)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 del frame
                 self.camera.release()
