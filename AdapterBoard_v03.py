@@ -46,6 +46,7 @@ class MultiAdapter:
         gp.output(11, gpio_sta[1])
         gp.output(12, gpio_sta[2])
         print ('gets here')
+        
     def select_channel(self,index):
         channel_info = self.adapter_info.get(index)
         if channel_info == None:
@@ -69,6 +70,7 @@ class MultiAdapter:
                pname = "image_"+ chr(65+i)+".jpg"
                cv.imwrite(pname,frame)
                time.sleep(1)
+
     def preview(self):
         font                   = cv.FONT_HERSHEY_PLAIN
         fontScale              = 1
@@ -104,6 +106,41 @@ class MultiAdapter:
                 i = 0
             cv.putText(black,'CAM '+index, bottomLeftCornerOfText, font, fontScale,fontColor,lineType)
             cv.imshow("Arducam Multi Camera Demo",black)
+            if cv.waitKey(1) & 0xFF == ord('q'):
+                del frame
+                self.camera.release()
+                cv.destroyAllWindows()
+                break
+
+    #initialize a channel (0 - 3)
+    def init_channel(self,width,height,index):
+       channel = chr(65+index)
+       print("Initialize channel: " + str(channel))
+       self.height = height
+       self.width = width
+       self.choose_channel(channel)
+       self.camera.set(3, self.width) #set camera width - https://stackoverflow.com/questions/40348656/editing-camera-settings-by-using-opencv
+       self.camera.set(4, self.height) #set camera height
+       ret, frame = self.camera.read()
+       if ret == True:
+           print("camera %s init OK" %(channel))
+           pname = "image_"+ channel +".jpg"
+           cv.imwrite(pname,frame)
+           time.sleep(1)
+
+    #preview a channel (0 - 3)
+    def preview_channel(self,index):
+        factor  = 20
+        channel = chr(65+index)
+        print("Preview channel: " + str(channel))
+        while True:
+            self.select_channel(channel)
+            ret, frame = self.camera.read()
+            ret, frame = self.camera.read() #are these needed?
+            ret, frame = self.camera.read() #are these needed?
+            frame.dtype=np.uint8
+
+            cv.imshow("Arducam Multi Camera Demo",frame)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 del frame
                 self.camera.release()
