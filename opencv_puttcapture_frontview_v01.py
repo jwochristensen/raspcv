@@ -1,7 +1,7 @@
 # import the necessary packages
 from collections import deque
-from imutils.video import VideoStream
-from matplotlib import pyplot as plt
+#from imutils.video import VideoStream
+#from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 import argparse
@@ -211,32 +211,7 @@ def find_direction_and_trace_path(pts, frame, buffer, counter, puttid):
             #continue
             raise Exception('no pts in list')
             break
-		# check to see if enough points have been accumulated in
-		# the buffer
-        # if counter >= 10 and i == 1 and pts[-10] is not None:
-		# 	# compute the difference between the x and y
-		# 	# coordinates and re-initialize the direction
-		# 	# text variables
-        #     dX = pts[-10][0] - pts[i][0] #should this not be pts[i-10][0]?
-        #     dY = pts[-10][1] - pts[i][1]
-        #     (dirX, dirY) = ("", "")
-		# 	# ensure there is significant movement in the
-		# 	# x-direction
-        #     if np.abs(dX) > 20:
-        #         dirX = "East" if np.sign(dX) == 1 else "West"
-		# 	# ensure there is significant movement in the
-		# 	# y-direction
-        #     if np.abs(dY) > 20:
-        #         dirY = "North" if np.sign(dY) == 1 else "South"
-		# 	# handle when both directions are non-empty
-        #     if dirX != "" and dirY != "":
-        #         direction = "{}-{}".format(dirY, dirX)
-		# 	# otherwise, only one direction is non-empty
-        #     else:
-        #         direction = dirX if dirX != "" else dirY
 
-		# otherwise, compute the thickness of the line and
-		# draw the connecting lines
         thickness = int(np.sqrt(buffer / float(i + 1)) * 2.5)
         cv2.line(frame, pts[i - 1], pts[i], puttcolor, thickness) #draw line between each point
 
@@ -270,6 +245,7 @@ def update_puttlog(puttlog, puttid):
         except:
             print('Error: translate putt dist')
         puttlog.append([puttid, int(min_ycoord), int(min_radius), int(dist_est)])
+        #will need to message updated putt back to UI/app
 
     return puttlog
 
@@ -288,16 +264,16 @@ def getCameraVideo():
     index = 0 #get the first video channel
     Arducam_adapter_board = AdapterBoard.MultiAdapter()
     if __name__ == "__main__":
-        Arducam_adapter_board.init_channel(320,240,index) #get the first video channel
+        #Arducam_adapter_board.init_channel(320,240,index) #get the first video channel
+        Arducam_adapter_board.init_channel(800,600,index) #get the first video channel
         channel = chr(65+index)
         Arducam_adapter_board.select_channel(channel)
 
-    return Arducam_adapter_board
+    return Arducam_adapter_board.camera
 
 #cap = cv2.VideoCapture('200530_Putt2_video.mov')
 
-# if a video path was not supplied, grab the reference
-# to the webcam
+# if a video path was not supplied, grab the reference to the camera
 if not args.get("video", False):
 	#vs = VideoStream(src=0).start()
     vs = getCameraVideo()
@@ -311,31 +287,28 @@ time.sleep(2.0)
 # keep looping
 while True:
 	# grab the current frame
-    frame = vs.read()
+    res, frame = vs.read()
 	# handle the frame from VideoCapture or VideoStream
     frame = frame[1] if args.get("video", False) else frame
 
 	# if we are viewing a video and we did not grab a frame,then we have reached the end of the video
     if frame is None:
         break
+
 	# rotate frame
-    frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE) #rotate clockwise
-    frame = cv2.resize(frame[0:1920,0:1080], (472,840))
+    #frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE) #rotate clockwise
+    #frame = cv2.resize(frame[0:1920,0:1080], (472,840))
 
     if (counter < 2 and testing == True):
         img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        plt.imshow(img)
-        plt.show()
+        #plt.imshow(img)
+        #plt.show()
 
     try:
-        mask_white = create_white_mask(frame) #frame
-        #cv2.imshow("white mask", mask)
-
-        # mask2 = create_green_mask(frame)
-        # cv2.imshow("green mask", mask2) #do i need to invert this mask?
+        mask_white = create_white_mask(frame) #create white mask to find white objects
 
         mask_backsub = create_background_mask(mask_white, backSub)
-        cv2.imshow("background mask", mask_backsub)
+        #cv2.imshow("background mask", mask_backsub)
 
         mask_roi = create_region_ofinterest(mask_backsub, pts_focusArea)
         cv2.imshow("roi", mask_roi)
@@ -458,42 +431,3 @@ print(puttlog)
 #[93, 105, 91], [144, 166, 169], [159, 181, 185], [164, 186, 189],
 # [213, 227, 208] ->
 #, [246, 255, 247]
-
-
-
-
-
-
-    # for i in np.arange(1, len(pts)):
-	# 	# if either of the tracked points are None, ignore
-	# 	# them
-    #     if pts[i - 1] is None or pts[i] is None:
-    #         continue
-	# 	# check to see if enough points have been accumulated in
-	# 	# the buffer
-    #     if counter >= 10 and i == 1 and pts[-10] is not None:
-	# 		# compute the difference between the x and y
-	# 		# coordinates and re-initialize the direction
-	# 		# text variables
-    #         dX = pts[-10][0] - pts[i][0] #should this not be pts[i-10][0]?
-    #         dY = pts[-10][1] - pts[i][1]
-    #         (dirX, dirY) = ("", "")
-	# 		# ensure there is significant movement in the
-	# 		# x-direction
-    #         if np.abs(dX) > 20:
-    #             dirX = "East" if np.sign(dX) == 1 else "West"
-	# 		# ensure there is significant movement in the
-	# 		# y-direction
-    #         if np.abs(dY) > 20:
-    #             dirY = "North" if np.sign(dY) == 1 else "South"
-	# 		# handle when both directions are non-empty
-    #         if dirX != "" and dirY != "":
-    #             direction = "{}-{}".format(dirY, dirX)
-	# 		# otherwise, only one direction is non-empty
-    #         else:
-    #             direction = dirX if dirX != "" else dirY
-    #
-	# 	# otherwise, compute the thickness of the line and
-	# 	# draw the connecting lines
-    #     thickness = int(np.sqrt(buffer / float(i + 1)) * 2.5)
-    #     cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
